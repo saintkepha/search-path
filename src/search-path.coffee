@@ -3,6 +3,9 @@
 path    = require 'path'
 fs      = require 'fs'
 
+class Content extends String
+  constructor: -> super
+
 class SearchPath extends Array
   constructor: (@opts={}) ->
     @opts.basedir ?= process.cwd()
@@ -55,6 +58,6 @@ class SearchPath extends Array
     @locate files
 
   fetch: ->
-    (@resolve ([].concat arguments...)).map (f) -> fs.readFileSync f, @opts.encoding
+    (@resolve ([].concat arguments...)).map (f) => fs.readFileSync f, @opts.encoding
 
 module.exports = SearchPath
