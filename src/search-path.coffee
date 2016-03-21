@@ -6,11 +6,16 @@ fs      = require 'fs'
 class SearchPath extends Array
   constructor: (@opts={}) ->
     @opts.basedir ?= process.cwd()
+    @opts.encoding ?= 'utf-8'
     @opts.exts = [].concat @opts.exts...
     super
 
-  exists: (paths, opts=@opts) ->
-    paths
+  exists: (paths..., opts={}) ->
+    unless opts instanceof Object
+      paths.push opts
+      opts = {}
+    opts[k] = v for k, v of @opts when not opts[k]?
+    [].concat paths...
       .filter (f) -> (typeof f is 'string') and !!f
       .map (f) -> path.resolve opts.basedir, f
       .filter (f) ->
@@ -26,10 +31,18 @@ class SearchPath extends Array
   base: (path=@opts.basedir) -> @opts.basedir = path; this
 
   # TODO: optimize to remove duplicates
-  add: ->
+  include: ->
     @unshift (@exists ([].concat arguments...), isDirectory: true)...
 
   locate: ->
+    files = [].concat arguments...
+    res = []
+    @forEach (dir) =>
+      #console.log "checking #{dir} for #{files}"
+      res.push (@exists (files.map (f) -> path.resolve dir, f), isFile: true)...
+    return res
+
+  resolve: ->
     files =
       ([].concat arguments...)
         .filter (x) -> x? and !!x
@@ -39,13 +52,9 @@ class SearchPath extends Array
             a.push "#{b}.#{ext}" for ext in @opts.exts
           return a
         ), []
-    res = []
-    @forEach (dir) =>
-      #console.log "checking #{dir} for #{files}"
-      res.push (@exists (files.map (f) -> path.resolve dir, f), isFile: true)...
-    return res
+    @locate files
 
   fetch: ->
-    (@locate ([].concat arguments...)).map (f) -> fs.readFileSync f, 'utf-8'
+    (@resolve ([].concat arguments...)).map (f) -> fs.readFileSync f, @opts.encoding
 
 module.exports = SearchPath
