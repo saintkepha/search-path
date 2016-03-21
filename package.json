@@ -1,6 +1,6 @@
 {
   "name": "search-path",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "locate and fetch files from the filesystem using search path",
   "main": "lib/index.js",
   "scripts": {
