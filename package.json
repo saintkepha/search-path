@@ -1,0 +1,39 @@
+{
+  "name": "search-path",
+  "version": "1.0.0",
+  "description": "locate and fetch files from the filesystem using search path",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saintkepha/search-path.git"
+  },
+  "keywords": [
+    "locate",
+    "search",
+    "fetch",
+    "path",
+    "file",
+    "include",
+    "link",
+    "cache"
+  ],
+  "author": "Peter K. Lee <peter@corenova.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/saintkepha/search-path/issues"
+  },
+  "homepage": "https://github.com/saintkepha/search-path#readme",
+  "devDependencies": {
+    "coffee-script": "^1.10.0",
+    "mocha": "^2.4.5"
+  },
+  "engines": {
+    "node": ">=0.10.28"
+  },
+  "scripts": {
+    "prepublish": "coffee -o lib -c src"
+  }
+}
