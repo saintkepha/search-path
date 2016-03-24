@@ -30,20 +30,37 @@ class SearchPath extends Array
           when opts.isFile then stat.isFile()
           else false
 
+  unique: (key) ->
+    return @ unless @length > 0
+    output = {}
+    unless key?
+      output[@[key]] = @[key] for key in [0...@length]
+    else
+      for k in [0..@length-1] when typeof @[k] is 'object'
+        val = @[k]
+        idx = val[key]
+        idx ?= val.get? key
+        idx ?= k
+        continue unless idx?
+        output[idx] = val
+    (value for key, value of output)
+
   # used to specify 'basedir' to use when adding relative paths
   base: (path=@opts.basedir) -> @opts.basedir = path; this
 
-  # TODO: optimize to remove duplicates
+  # TODO: optimize further to remove duplicates that may be part of the
+  # overall searchpath array
   include: ->
-    @unshift (@exists ([].concat arguments...), isDirectory: true)...
+    dirs = [].concat arguments...
+    @unshift (@unique.call (@exists dirs, isDirectory: true))...
 
   locate: ->
     files = [].concat arguments...
-    res = []
-    @forEach (dir) =>
+    res = @exists files, isFile: true
+    @unique().forEach (dir) =>
       #console.log "checking #{dir} for #{files}"
       res.push (@exists (files.map (f) -> path.resolve dir, f), isFile: true)...
-    return res
+    return (@unique.call res)
 
   resolve: ->
     files =
